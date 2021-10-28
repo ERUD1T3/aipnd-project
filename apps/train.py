@@ -15,7 +15,7 @@ def parse_args():
     parser.add_argument('--save_dir', type=str,
                         help='directory where to save your neural network. By default it will save in current directory')
     parser.add_argument(
-        '--arch', type=str, help='models to pretrain from (vgg, alexnet, or densenet)')
+        '--arch', type=str, help='models to pretrain from (vgg16, alexnet, or densenet121)')
     parser.add_argument('--learning_rate', type=float,
                         help='learning rate of training')
     parser.add_argument('--hidden_units', type=int,
@@ -74,17 +74,17 @@ def build_model(arch=None, hidden_units=None):
     '''build the deep neural network model'''
 
     if arch is None:
-        arch = 'vgg'
+        arch = 'vgg16'
     hidden_units = 4096 if hidden_units is None else int(hidden_units)
 
     # choosing architecture
-    if arch == 'vgg':
-        model = models.vgg13_bn(pretrained=True)
+    if arch == 'vgg16':
+        model = models.vgg16(pretrained=True)
         input_units = 25088
     elif arch == 'alexnet':
         model = models.alexnet(pretrained=True)
         input_units = 9216
-    elif arch == 'densenet':
+    elif arch == 'densenet121':
         model = models.densenet121(pretrained=True)
         input_units = 1024
 
@@ -210,7 +210,7 @@ def save_model(model, save_dir=None):
         model_path = f'{save_dir}/trained_model.pth'
 
     checkpoint = {
-        # 'arch': 'vgg13_bn',
+        # 'arch': 'vgg16',
         # 'input_size': 25088,
         # 'output_size': 102,
         # 'hidden_units': 4096,
@@ -249,9 +249,9 @@ def main():
     if (not set(data_dir).issubset({'test', 'train', 'valid'})):
         raise Exception('[ERROR] Missing test, train or valid sub-directories')
 
-    if args.arch not in ('vgg', 'alexnet', 'densenet', None):
+    if args.arch not in ('vgg16', 'alexnet', 'densenet121', None):
         raise Exception(
-            '[ERROR] --arch option: Unsupported model. Supported: vgg, alexnet, and densenet.')
+            '[ERROR] --arch option: Unsupported model. Supported: vgg16, alexnet, and densenet121.')
 
     if args.gpu and torch.cuda.is_available():
         device = torch.device("cuda")
