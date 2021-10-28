@@ -15,7 +15,7 @@ def parse_args():
     parser.add_argument('--save_dir', type=str,
                         help='directory where to save your neural network. By default it will save in current directory')
     parser.add_argument(
-        '--arch', type=str, help='models to pretrain from (vgg13, vgg19, densenet)')
+        '--arch', type=str, help='models to pretrain from (vgg, alexnet, or densenet)')
     parser.add_argument('--learning_rate', type=float,
                         help='learning rate of training')
     parser.add_argument('--hidden_units', type=int,
@@ -114,7 +114,7 @@ def train_model(
         device):
     '''train the deep neural network model on the data'''
 
-    print_every = 10
+    print_every = 1
     learning_rate = .001 if learning_rate is None else float(learning_rate)
     epochs = 10 if epochs is None else int(epochs)
     if device is None:
@@ -127,6 +127,7 @@ def train_model(
     )
 
     steps = 0
+    running_loss = 0
     model.to(device)
 
     for epoch in range(epochs):
@@ -257,7 +258,7 @@ def main():
 
     # running the main training
     print('All arguments valid!\nProcessing the datasets...')
-    loaders = get_data(data_dir)
+    loaders = get_data(args.data_dir)
     print('Datasets processed!\nBuilding the deep neural network model...')
     model = build_model(args.arch, args.hidden_units)
     print('Model built!\ntraining the model...')
