@@ -10,9 +10,9 @@ def parse_args():
     '''parse the arguments for the predict application'''
     parser = argparse.ArgumentParser(
         description='Classify an image using your neural network')
-    parser.add_argument('image_path', type=str, required=True,
+    parser.add_argument('image_path', type=str,
                         help='path to the input image to classifier (required)')
-    parser.add_argument('checkpoint', type=str, required=True,
+    parser.add_argument('checkpoint', type=str,
                         help='path to the model checkpoint (required)')
     parser.add_argument('--top_k', type=int,
                         help='number of top classes to show (default 5)')
