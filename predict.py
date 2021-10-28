@@ -47,7 +47,7 @@ def preprocess(image_path):
 def load_model(model_path):
     ''''load model checkpoint from the model_path'''
     checkpoint = torch.load(model_path)
-    model = checkpoint['arch']
+    model = checkpoint['model']
     model.classifier = checkpoint['classifier']
     model.load_state_dict(checkpoint['state_dict'])
     return checkpoint, model
@@ -97,22 +97,26 @@ def print_pred(predictions, cat_file_path=None):
 
 def main():
     '''Run the classification with all the options provided and return the predictions'''
+
+    print('Validating arguments...')
     args = parse_args()
 
-    device = None
     if args.gpu and torch.cuda.is_available():
         device = torch.device("cuda")
     elif not args.gpu:
         device = torch.device("cpu")
     else:
-        raise Exception("--gpu option: [Error] No GPU found")
+        raise Exception("[ERROR] --gpu option: No GPU found")
 
+    print('All arguments valid!\nQuerying the classifier...')
     predictions = predict(
         args.image_path,
         args.checkpoint,
         args.top_k,
         device
     )
+
+    print('Query complete!\n Image results: ')
     print_pred(predictions, args.category_names)
     return predictions
 
