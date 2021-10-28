@@ -84,7 +84,6 @@ def print_pred(predictions, cat_file_path=None):
     k = 0
     for prob, cl in predictions:
         k += 1
-        prob = f'{round(prob, 4) * 100.}%'
         if cat_file_path:
             with open(cat_file_path, 'r') as cf:
                 cat_to_name = json.load(cf)
@@ -92,23 +91,28 @@ def print_pred(predictions, cat_file_path=None):
         else:
             cl = f'class {cl}'
 
-        print(f'{k}. {cl} ({prob})')
+        print(f'{k}. {cl} ({round(prob, 4)*100.:.3f}%)')
 
 
 def main():
     '''Run the classification with all the options provided and return the predictions'''
 
-    print('Validating arguments...')
+    print(
+        "*************************************************\nCLASSIFY YOUR FLOWER USING A DEEP NEURAL NETWORK!\n*************************************************\n"
+    )
+
+    print('[LOG] Validating arguments...')
     args = parse_args()
 
     if args.gpu and torch.cuda.is_available():
         device = torch.device("cuda")
+        print('[LOG] GPU enabled')
     elif not args.gpu:
         device = torch.device("cpu")
     else:
-        raise Exception("[ERROR] --gpu option: No GPU found")
+        raise Exception("[ERROR]--gpu option:  GPU not found")
 
-    print('All arguments valid!\nQuerying the classifier...')
+    print('[LOG] All arguments valid!\n[LOG] Querying the classifier...')
     predictions = predict(
         args.image_path,
         args.checkpoint,
@@ -116,7 +120,7 @@ def main():
         device
     )
 
-    print('Query complete!\n Image results: ')
+    print('[SUCCESS] Query complete!\n[LOG] Image results: ')
     print_pred(predictions, args.category_names)
     return predictions
 

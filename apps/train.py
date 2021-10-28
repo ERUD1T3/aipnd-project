@@ -96,7 +96,7 @@ def build_model(arch=None, hidden_units=None):
     classifier = nn.Sequential(
         nn.Linear(input_units, int(hidden_units)),
         nn.ReLU(),
-        nn.Dropout(.2),
+        nn.Dropout(.5),
         nn.Linear(hidden_units, 102),
         nn.LogSoftmax(dim=1)
     )
@@ -114,9 +114,9 @@ def train_model(
         device):
     '''train the deep neural network model on the data'''
 
-    print_every = 1
+    print_every = 5
     learning_rate = .001 if learning_rate is None else float(learning_rate)
-    epochs = 10 if epochs is None else int(epochs)
+    epochs = 5 if epochs is None else int(epochs)
     if device is None:
         device = torch.device('cpu')
 
@@ -164,7 +164,7 @@ def train_model(
                         accuracy += torch.mean(equals.type(torch.FloatTensor)).item()
 
                 print(
-                    f"Epoch {epoch+1}/{epochs}.. "
+                    f"[LOG] Epoch {epoch+1}/{epochs} -- "
                     f"Train loss: {running_loss/print_every:.3f}.. "
                     f"Val loss: {valid_loss/len(validloader):.3f}.. "
                     f"Val accuracy: {accuracy/len(validloader):.3f}"
@@ -195,7 +195,7 @@ def test_model(model, testloader, device=None):
             accuracy += torch.mean(equals.type(torch.FloatTensor)).item()
 
     res = accuracy/len(testloader)
-    print(f"Model Accuracy: {res:.3f}")
+    print(f"[LOG] Model Accuracy: {res:.3f}")
     return res
 
 
@@ -230,6 +230,10 @@ def main():
     '''Building and training of a deep neural network model with all the option 
        provided. Trained model will be save in the provided save directory'''
 
+    print(
+        "**********************************************************\nBUILD AND TRAIN A DEEP NEURAL NETWORK TO CLASSIFY FLOWERS!\n***********************************************************\n"
+    )
+
     print('Validating arguments...')
     args = parse_args()
 
@@ -251,17 +255,18 @@ def main():
 
     if args.gpu and torch.cuda.is_available():
         device = torch.device("cuda")
+        print('[LOG] GPU enabled')
     elif not args.gpu:
         device = torch.device("cpu")
     else:
-        raise Exception("--gpu option: [Error] No GPU found")
+        raise Exception("[ERROR]--gpu option:  GPU not found")
 
     # running the main training
-    print('All arguments valid!\nProcessing the datasets...')
+    print('[LOG] All arguments valid!\n[LOG] Processing the datasets...')
     loaders = get_data(args.data_dir)
-    print('Datasets processed!\nBuilding the deep neural network model...')
+    print('[LOG] Datasets processed!\n[LOG] Building the deep neural network model...')
     model = build_model(args.arch, args.hidden_units)
-    print('Model built!\ntraining the model...')
+    print('[LOG] Model built!\n[LOG] training the model...')
     trained_model = train_model(
         model,
         loaders['train'],
@@ -270,15 +275,16 @@ def main():
         args.epochs,
         device
     )
-    print('Model trained!\nTesting model accuracy...')
+    print('[LOG] Model trained!\n[LOG] Testing model accuracy...')
     test_model(
         trained_model,
         loaders['test'],
         device
     )
-    print('Saving model...')
+    print('[LOG] Saving model...')
     model_path = save_model(trained_model, args.save_dir)
-    print(f'All training complete!\nTrained model saved as {model_path}.')
+    print(
+        f'[SUCCESS] All training complete!\n[LOG] Trained model saved as {model_path}.')
 
 
 if __name__ == '__main__':
